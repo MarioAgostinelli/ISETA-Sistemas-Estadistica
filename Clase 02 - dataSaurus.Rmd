@@ -19,14 +19,28 @@ dsd <- datasaurus_dozen
 dsd$dataset <- factor(dsd$dataset)
 str(dsd)
 summary(dsd)
+dsd
 ```
 
 
 ```{r}
-resumen <- dsd %>% group_by(dataset) %>% reframe(n = n(), mediaX = mean(x), medianaX = median(x), sdX = sd(x), mediaY = mean(y), medianaY = median(y), sdY = sd(x))
+resumen <- dsd %>% 
+  group_by(dataset) %>% 
+  reframe(n = n(), mediaX = mean(x), medianaX = median(x), sdX = sd(x), mediaY = mean(y), medianaY = median(y), sdY = sd(x))
 resumen
 ```
 
+```{r fig.height=8, fig.width=8}
+#ggplot(dsd, aes(x = x, y = y)) + 
+ggplot(dsd, aes(y = y)) + 
+  geom_boxplot() +
+  stat_boxplot(geom = "errorbar",
+               width = 0.25) +
+#  geom_jitter(width = 0.1) +
+  xlab("Muestra") + ylab("Largos (cm)") +
+  ylim(0,100) + 
+  facet_wrap(~dataset)
+```
 
 
 ```{r fig.height=15, fig.width=9}
@@ -39,4 +53,19 @@ ggplot(dsd,
   theme(aspect.ratio = 1)
 ```
 
-
+## Pipes y capas (layers) de ggplot2
+```{r fig.height=8, fig.width=8}
+dsd %>% 
+  group_by(dataset)  %>% 
+    ggplot() + 
+    aes(x = x, y = y, colour=dataset) +
+    geom_boxplot() +
+    stat_boxplot(geom = "errorbar", width = 0.25) +
+    geom_point(alpha = 0.3) +
+    theme_minimal() + 
+    theme(legend.position = "none") +
+    xlab("Muestra") + ylab("Largos (cm)") +
+    ylim(0,100) + 
+    theme(aspect.ratio = 1) + 
+    facet_wrap(~dataset)
+```
