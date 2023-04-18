@@ -28,6 +28,7 @@ nA <- length(muestraA)
 mediaA <- sum(muestraA) / length(muestraA)
 
 muestraA
+iA
 sumatoriaA
 nA 
 mediaA
@@ -157,7 +158,7 @@ boxplot(muestras, ylim=c(0,90), ylab = "x")
 ```
 #### Histograma
 ```{r}
-hist(muestras$muestraA)
+hist(muestras[[2]])
 ```
 
 ### Gráficos ggplot2 (tidyverse)
