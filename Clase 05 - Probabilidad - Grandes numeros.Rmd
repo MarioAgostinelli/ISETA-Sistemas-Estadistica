@@ -1,0 +1,132 @@
+---
+title: "Clase 05 - Probabilidad - Grandes números."
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library("gridExtra")
+```
+
+
+# Experimentos Aleatorios
+## Tirando dados
+```{r fig.height=8, fig.width=4}
+espacioMuestral <- c(1,2,3,4,5,6)
+experimentos <- 1:3
+graficos <- list()
+for (i in experimentos) {
+  # Cantidad de veces que se arroja un dado
+  cantTiradas <- 10^(i+1)
+  result <- tibble(valor = integer())
+  for (j in 1:cantTiradas) {
+    result  <- add_row(result, valor = sample(espacioMuestral, 1, replace = TRUE))
+  }
+  cv <- sd(reframe(result, cant = n(), .by = valor)$cant)/(cantTiradas/6)
+  graficos[[i]] <- ggplot(result, aes(valor)) +
+    geom_histogram(binwidth = 0.5 , center = 0) +
+    scale_x_continuous(breaks = espacioMuestral) +
+    ggtitle(paste("Cantidad de tiradas: ", cantTiradas, " - cv: ", as.character(cv))) + 
+    theme(plot.title = element_text(size=10))
+}
+do.call("grid.arrange", c(graficos, nrow = 3)) 
+```
+
+## Tirando monedas
+```{r fig.height=10, fig.width=4}
+espacioMuestral <- c(1,2)
+experimentos <- 1:4
+graficos <- list()
+for (i in experimentos) {
+  # Cantidad de veces que se arroja un dado
+  cantTiradas <- 10^(i)
+  result <- tibble(valor = integer())
+  for (j in 1:cantTiradas) {
+    result  <- add_row(result, valor = sample(espacioMuestral, 1, replace = TRUE))
+  }
+  cv <- sd(reframe(result, cant = n(), .by = valor)$cant)/(cantTiradas/6)
+  graficos[[i]] <- ggplot(result, aes(valor)) +
+    geom_histogram(binwidth = 0.5 , center = 0) +
+    scale_x_continuous(breaks = espacioMuestral) +
+    ggtitle(paste("Cantidad de tiradas: ", cantTiradas, " - cv: ", as.character(cv))) + 
+    theme(plot.title = element_text(size=10))
+}
+do.call("grid.arrange", c(graficos, nrow = 4)) 
+
+```
+
+# Simulaciones Montecarlo
+La función replicate(cantidadDeVeces, { procedimiento }), hace una simulación Montecarlo, que es muy eficiente en el uso de valores al azar.
+## Dados
+```{r fig.height=10, fig.width=4}
+espacioMuestral <- rep(c(1, 2, 3, 4, 5, 6), times = c(1, 1, 1, 1, 1, 1))
+experimentos <- 1:5
+graficos <- list()
+for (i in experimentos) {
+  cantTiradas <- 10^i
+  resultados <- replicate(cantTiradas, {
+  sample(espacioMuestral, 1, replace = TRUE)
+  })
+  resultados <- tibble(resultados)
+  cv <- sd(as.data.frame(table(resultados))$Freq)/(cantTiradas/6)
+  graficos[[i]] <- ggplot(resultados, aes(resultados)) +
+    geom_histogram(binwidth = 0.5 , center = 0) +
+    scale_x_continuous(breaks = espacioMuestral) +
+    ggtitle(paste("Cantidad de tiradas: ", cantTiradas, " - cv: ", as.character(cv))) + 
+    theme(plot.title = element_text(size=10))
+}
+do.call("grid.arrange", c(graficos, nrow = 5)) 
+```
+### Frecuencias relativas
+```{r}
+probEvento <- function(espacioMuestral,evento,n) {
+  resultado <- replicate(n, {
+    evento == sample(espacioMuestral, 1)
+    })
+  mean(resultado)
+}
+```
+
+
+```{r}
+repsExp <- seq(10,10000,10)
+serie <- tibble(n = integer(), prob = double())
+for (i in repsExp) {
+  serie <- add_row(serie, n = i, prob = probEvento(c(1,2,3,4,5,6),1,i))
+}
+ggplot(serie, aes(x = n, y = prob)) + 
+  geom_point(alpha = 0.3)
+```
+
+```{r}
+repsExp <- seq(100,20000,100)
+serie <- tibble(n = integer(), prob = double())
+for (i in repsExp) {
+  serie <- add_row(serie, n = i, prob = probEvento(c(1,2,3,4,5,6),1,i))
+}
+ggplot(serie, aes(x = n, y = prob)) + 
+  geom_point(alpha = 0.3)
+```
+
+## Moneda
+```{r fig.height=10, fig.width=4}
+espacioMuestral <- rep(c(0,1), times = c(1, 1))
+experimentos <- 1:5
+graficos <- list()
+for (i in experimentos) {
+  cantTiradas <- 10^i
+  resultados <- replicate(cantTiradas, {
+  sample(espacioMuestral, 1, replace = TRUE)
+  })
+  resultados <- tibble(resultados)
+  cv <- sd(as.data.frame(table(resultados))$Freq)/(cantTiradas/6)
+  graficos[[i]] <- ggplot(resultados, aes(resultados)) +
+    geom_histogram(binwidth = 0.5 , center = 0) +
+    scale_x_continuous(breaks = espacioMuestral) +
+    ggtitle(paste("Cantidad de tiradas: ", cantTiradas, " - cv: ", as.character(cv))) + 
+    theme(plot.title = element_text(size=10))
+}
+do.call("grid.arrange", c(graficos, nrow = 5)) 
+```
+
