@@ -5,6 +5,7 @@ output: html_notebook
 
 ```{r}
 library(tidyverse)
+library(ggplot2)
 ```
 
 Adaptado de: 
@@ -73,14 +74,14 @@ mean(resultados)
 Creemos ahora la función calcula_probabilidad y estimemos usando esta función la probabilidad de encontrar al menos dos personas con el mismo día de cumpleaños en un grupo de 25 personas. Ésta vez tenemos que especificar que el muestreo es con "reemplazo" porque por default la función sample() es "sin reemplazo".
 
 ```{r}
-estima_probabilidad <- function(cantPersonas, veces = 10000){
+estimaProbabilidad <- function(cantPersonas, veces = 10000){
     resultados <- replicate(veces, {
         personas <- sample(dias, cantPersonas, replace = TRUE)
         any(duplicated(personas))
     })
     mean(resultados) 
 }
-estima_probabilidad(25)
+estimaProbabilidad(25)
 ```
 
 Finalmente, si ya tenemos una función que nos calcula en base al número de personas en un grupo podemos crear un vector numérico con el total de personas de diferentes grupos y luego aplicarle la función que hemos creado. El resultado lo podemos almacenar en la variable prob.
@@ -90,7 +91,7 @@ Finalmente, si ya tenemos una función que nos calcula en base al número de per
 # El primer grupo con 1 persona, el último grupo con 80 personas
 grupos <- 1:80
 # Estimamos la probabilidad dependiendo del número de personas por grupo
-prob <- sapply(grupos, estima_probabilidad)
+prob <- sapply(grupos, estimaProbabilidad)
 prob
 ```
 
