@@ -85,7 +85,7 @@ class(instante) # "POSIXct" "POSIXt"
 dimensiones	    Homogeneous	    Heterogeneous
 ------------    ------------    --------------
 1d	            Vector          List
-2d	            Matrix	        Data frame
+2d	            Matrix	        Data frame / tibble
 nd	            Array
 
 ## Vectores

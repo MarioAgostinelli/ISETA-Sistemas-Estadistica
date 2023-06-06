@@ -1,0 +1,67 @@
+---
+title: "R Sistemas - Estadística - Bayes - StandUpMaths"
+output: html_notebook
+---
+
+# Bayes - Stand Up Maths
+### Fuente: Matt Parker. "Bayesian Statistics with Hannah Fry". https://www.youtube.com/watch?v=7GgLSnQ48os
+Este ejemplo está inspirado en el video anterior, la intensión es simular el ejemplo que en el video se realiza físicamente.
+
+El ejercicio consta de una mesa (con coordenadas cartesianas establecidas sobre el), y una silla de espaldas a la mesa. Una persona (A) se sienta en la silla y aroja hacia atrás, sin mirar, una pequeña bolsa de arena (para que no rebote) sobre la mesa. La posición de esta bolsa es el "objetivo", es decir la posición que debemos estimar. 
+Luego una segunda persona (B) que no miró el proceso anterior, y por lo tanto no conoce la posición de la bolsa original, se sienta en la silla y arroja la bolsa nuevamente. Entonces A registra en una planilla las coordenadas donde cayó la bolsa y calcula las diferencias en la posición respecto de la posición "objetivo" (previamente registrada).
+Finalmente B debe estimar la posición "objetivo" con la información de las diferencias que le informa A.
+Se supone que al lanzar la bolsa la posición obtenida es al azar.
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+## Primero se fija el objetivo. Persona A
+```{r}
+# objetivo <- matrix(1:2,2,1)
+objetivo <- sample(-10:10,2, replace = TRUE)
+objetivo
+```
+
+## Luego se arrojan las bolsas al azar. Persona B
+```{r}
+muestreoX <- sample(-10:10,20, replace = TRUE)
+muestreoY <- sample(-10:10,20, replace = TRUE)
+matrizMuestreo <- cbind(muestreoX, muestreoY)
+matrizMuestreo
+```
+## Luego A calcula las diferencias entre las posiciones obtenidas por B y el objetivo
+```{r}
+diferenciasX <- objetivo[1] - muestreoX
+diferenciasY <- objetivo[2] - muestreoY
+diferencias <- cbind(diferenciasX, diferenciasY)
+# diferencias <- diferencias * -1
+diferencias
+```
+
+## Ahora se puede estimar la posición del objetivo.
+```{r}
+puntoEstimado <- c(mean(diferenciasX), mean(diferenciasY))
+# diferencias %>% reframe(meanX = mean(diferenciasX), meanY = mean(diferenciasY))
+
+objetivo
+puntoEstimado
+puntoEstimado - objetivo
+```
+
+## Finalmente un gráfico muestra toda la información
+```{r}
+diferencias <- data.frame(diferencias)
+grafico1 <- ggplot(diferencias, aes(diferenciasX, diferenciasY)) + 
+  geom_point() + 
+  geom_point(aes(x=objetivo[1], y=objetivo[2]), colour="red") + 
+  geom_point(aes(x=mean(diferenciasX), y=mean(diferenciasY)), colour="green") + 
+  geom_segment(aes(x = objetivo[1], y = objetivo[2], xend = mean(diferenciasX), yend = mean(diferenciasY)), arrow = arrow(length = unit(0.2, "cm"))) +
+  xlim(-20, 20) + 
+  ylim(-20, 20) + 
+  theme(aspect.ratio = 1)
+grafico1
+```
+
+
